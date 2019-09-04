@@ -79,6 +79,25 @@ func (this *GroupService) GetGroups(userId string) []info.Group {
 	return groups
 }
 
+// 仅仅得到所有分组
+func (this *GroupService) GetAllGroups() []info.Group {
+	// 得到分组s
+	groups := []info.Group{}
+	db.ListByQ(db.Groups, bson.M{}, &groups)
+	return groups
+}
+
+// 仅仅得到所有分组
+func (this *GroupService) GetGroupByTitle(title string) info.Group {
+	// 得到分组s
+	groups := []info.Group{}
+	db.ListByQ(db.Groups, bson.M{"Title": title}, &groups)
+	if(len(groups)==0){
+		return info.Group{}
+	}
+	return groups[0]
+}
+
 // 得到我的和我所属组的ids
 func (this *GroupService) GetMineAndBelongToGroupIds(userId string) []bson.ObjectId {
 	// 所属组
@@ -182,6 +201,31 @@ func (this *GroupService) IsExistsGroupUser(userId, groupId string) (ok bool) {
 // 为group添加用户
 // 用户是否已存在?
 func (this *GroupService) AddUser(ownUserId, groupId, userId string) (ok bool, msg string) {
+	// groupId是否是ownUserId的?
+	/*
+		if !this.IsExistsGroupUser(ownUserId, groupId) {
+			return false, "forbiddenNotMyGroup"
+		}
+	*/
+	if !this.isMyGroup(ownUserId, groupId) {
+		return false, "forbiddenNotMyGroup"
+	}
+
+	// 是否已存在
+	if db.Has(db.GroupUsers, bson.M{"GroupId": bson.ObjectIdHex(groupId), "UserId": bson.ObjectIdHex(userId)}) {
+		return false, "userExistsInGroup"
+	}
+
+	return db.Insert(db.GroupUsers, info.GroupUser{
+		GroupUserId: bson.NewObjectId(),
+		GroupId:     bson.ObjectIdHex(groupId),
+		UserId:      bson.ObjectIdHex(userId),
+		CreatedTime: time.Now(),
+	}), ""
+}
+
+
+func (this *GroupService) AddUserByAdmin(ownUserId, groupId, userId string) (ok bool, msg string) {
 	// groupId是否是ownUserId的?
 	/*
 		if !this.IsExistsGroupUser(ownUserId, groupId) {

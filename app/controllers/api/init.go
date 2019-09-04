@@ -9,6 +9,7 @@ import (
 )
 
 var userService *service.UserService
+var groupService *service.GroupService
 var noteService *service.NoteService
 var trashService *service.TrashService
 var notebookService *service.NotebookService
@@ -117,11 +118,13 @@ func init() {
 	revel.InterceptFunc(AuthInterceptor, revel.BEFORE, &ApiNote{})
 	revel.InterceptFunc(AuthInterceptor, revel.BEFORE, &ApiTag{})
 	revel.InterceptFunc(AuthInterceptor, revel.BEFORE, &ApiNotebook{})
+	revel.InterceptFunc(AuthInterceptor, revel.BEFORE, &ApiMemberGroup{})
 }
 
 // 最外层init.go调用
 // 获取service, 单例
 func InitService() {
+	groupService=service.GroupS
 	notebookService = service.NotebookS
 	noteService = service.NoteS
 	noteContentHistoryService = service.NoteContentHistoryS

@@ -84,6 +84,16 @@ type ApiNotebook struct {
 	IsDeleted        bool          `IsDeleted`
 }
 
+//type ApiMemberGroup struct {
+//	GroupId     bson.ObjectId `bson:"_id"` // 谁的
+//	UserId      bson.ObjectId `UserId`     // 所有者Id
+//	Title       string        `Title`      // 标题
+//	UserCount   int           `UserCount`  // 用户数
+//	CreatedTime time.Time     `CreatedTime`
+//
+//	Users []User `Users,omitempty` // 分组下的用户, 不保存, 仅查看
+//}
+
 //---------
 // api 返回
 //---------
